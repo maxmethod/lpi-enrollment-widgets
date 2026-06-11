@@ -9,14 +9,16 @@ A **standalone, self-contained** set of client-side widgets embedded into one Go
 
 | Tool | What it does | Lookups? | Status |
 | --- | --- | --- | --- |
-| **A. RX + Provider Lookup** | Searches drugs (RxNorm) and doctors (NLM NPI), writes structured output to GHL custom fields for HealthSherpa. **Customized for this subaccount: "Who takes this?" applicant field + raised caps (20 meds / 10 providers).** | Yes | Built ✓ (LPI fork) |
+| **A1. Medications** | Drug search (RxNorm), strength/form/frequency + "Who takes this?" applicant field. Cap 20. | Yes | Built ✓ (`medications-lookup.html`) |
+| **A2. Doctors / Providers** | Doctor search (NLM NPI) with ZIP-radius filter. Cap 10. | Yes | Built ✓ (`provider-lookup.html`) |
 | **B. Income & Assets table** | A multi-step, add-as-many-rows-as-you-need table for income sources and assets. Pure manual entry. | No | Spec only |
-| **C. Current Coverage list** | Add-as-many-rows-as-you-need list of each household member's current health plan (type, carrier, member ID, dates, primary/secondary). Pure manual entry. | No | Built ✓ (`current-coverage-lookup.html`) |
+| **C. Current Coverage list** | Add-as-many-rows list of current health plans (type, carrier, start/end). Pure manual entry. | No | Built ✓ (`current-coverage-lookup.html`) |
 
-All write their data into GHL custom fields via the **same sync bridge** (Section 1.4). Tools B and C are essentially Tool A with the entire lookup layer removed and the search→card UI swapped for a direct add-form.
+All write their data into GHL custom fields via the **same sync bridge** (Section 1.4). **A1 and A2 are two independent embeds** (split from the original combined Rx+Provider widget) so they can be placed separately. B and C are A1/A2 with the lookup layer removed and the search→card UI swapped for a direct add-form. **All widgets default to the LPI teal `rgb(97,163,183)` / `#61a3b7`.**
 
 **Resolved decisions (2026-06-11):**
-- **Tool A output mapping = "both":** `medications_json` / `providers_json` → **new** dedicated LARGE_TEXT fields (HealthSherpa/automation); `medications_summary` / `providers_summary` → the **existing** `🏥 Prescriptions` / `🏥 Doctors` LARGE_TEXT fields (agent-readable). Mapping lives in a `FIELD_KEYS` const at the top of the widget script — override via `window.RX_CONFIG.fieldKeys`.
+- **Tool A output mapping = "both":** `medications_json` / `providers_json` → **new** dedicated LARGE_TEXT fields (HealthSherpa/automation); summaries → the **existing** `🏥 Prescriptions` (key `medications`) / `🏥 Doctors` (key `doctors`) LARGE_TEXT fields (agent-readable). Mapping lives in a `FIELD_KEYS` const at the top of each widget — override via `window.MEDS_CONFIG.fieldKeys` / `window.PROV_CONFIG.fieldKeys`.
+- **Split delivery:** Tool A ships as **two independent embeds** — `medications-lookup.html` (`#medications-lookup-widget`, `MEDS_CONFIG`) and `provider-lookup.html` (`#provider-lookup-widget`, `PROV_CONFIG`) — so prescriptions and doctors can be placed in separate code blocks.
 - **Tool C storage = new json+summary pair:** `current_coverage_json` + `current_coverage_summary`.
 - **Hosting = git repo + jsDelivr CDN** (one `<script>` per widget, versioned by tag). ⚠️ jsDelivr only serves **public** repos — see Section 1.10 caveat. The widgets carry no secrets/PHI, so a dedicated **public** repo for this subaccount is fine; if private is required, host `dist/*.js` on Cloudflare Pages / Netlify / GHL file hosting instead.
 
@@ -178,23 +180,28 @@ jsDelivr serves **immutable content per git tag**, so:
 
 ## 2. GHL integration contract (cheat-sheet — applies to both tools)
 
-**Placement:** the widget lives in a **funnel/landing-page Custom Code (Custom HTML) element**, sitting *alongside* the GHL form on the same page — **not inside the GHL Form Builder** (the builder sandboxes `<script>`, so the embed won't run there). The form just needs to contain the hidden custom fields and the submit button.
+**Placement:** the widget goes in a GHL **Custom Code / Custom HTML element**. The only hard requirement is that the widget and the form's custom fields end up in the **same rendered DOM/frame**, so `syncHiddenFields()` can find the fields. Two placements satisfy that, both fine:
+- **Directly inside the form** (a Custom HTML element *within* the form) — cleanest; widget and fields share the DOM. This is how the OG `doc-rx-lookup` tool was embedded.
+- **Alongside the form** on the same funnel/landing page (a page-level Custom Code element next to the form).
 
-**Embed snippet** (per tool):
+> ⚠️ The real gotchas (not "form builder = forbidden"): GHL's **in-builder preview** sometimes doesn't execute `<script>` — always test on the **published** form. And if the form is embedded elsewhere as an **iframe with `sandbox`**, scripts can be blocked there. A normal GHL-hosted form/funnel runs the embed fine.
+
+**Embed snippet** (per widget; `data-primary-color` locks the LPI teal so GHL's gold brand value can't override it):
 ```html
-<div id="rx-lookup-widget" data-primary-color="{{ custom_values.brand_primary_color }}"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@vX.Y.Z/dist/embed.js"></script>
+<div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.0/dist/embed-medications.js"></script>
 ```
 
 **Custom fields** — create in *Settings → Custom Fields*, type **Multi-line / Large text** (JSON payloads exceed single-line limits). The widget targets each by its **field key**, matching `[name="<key>"]` **and** `[data-q="<key>"]`.
 
 | Tool | Field keys (must match exactly) |
 | --- | --- |
-| A (RX) | **JSON → new fields:** `medications_json`, `providers_json`. **Summaries → existing fields:** `🏥 Prescriptions` (key **`medications`** ✓ verified), `🏥 Doctors` (key **`doctors`** ✓ verified). |
+| A1 (Medications) | `medications_json` (new) · `medications` (summary → existing `🏥 Prescriptions`) ✓ verified |
+| A2 (Doctors/Providers) | `providers_json` (new) · `doctors` (summary → existing `🏥 Doctors`) ✓ verified |
 | B (Income/Assets) | `income_json`, `income_summary`, `assets_json`, `assets_summary` *(confirm keys w/ HealthSherpa mapping owner)* |
 | C (Current Coverage) | `current_coverage_json`, `current_coverage_summary` *(both new)* |
 
-**Fields to create for this rollout (LARGE_TEXT, folder `LPI - Pre-Enrollment Form Data`):** `medications_json`, `providers_json`, `current_coverage_json`, `current_coverage_summary`. The two Rx summaries reuse the **existing** `🏥 Prescriptions` / `🏥 Doctors` fields — do **not** create new summary fields for them; instead confirm their real `data-q` keys and, if they differ from `prescriptions`/`doctors`, set `window.RX_CONFIG = { fieldKeys: { medications_summary: '<key>', providers_summary: '<key>' } }` before the embed loads.
+**Fields created for this rollout ✓ (LARGE_TEXT, folder `LPI - Pre-Enrollment Form Data` `QHuwbPgm36VRG0d5ZKw1`):** `medications_json`, `providers_json`, `current_coverage_json`, `current_coverage_summary`. The two summaries reuse the **existing** `🏥 Prescriptions` (key **`medications`**) / `🏥 Doctors` (key **`doctors`**) fields — verified on live 2026-06-11, no new summary fields needed.
 
 **Verify once in DevTools:** inspect a rendered hidden field and confirm `data-q` equals the bare key (e.g. `medications_json`, no `contact.` prefix). If GHL prefixes it, either rename the field key or widen the selector in `syncHiddenFields` to also match the prefixed form.
 

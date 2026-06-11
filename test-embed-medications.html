@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Embed Test — Medications (GHL Funnel Simulation)</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 0; }
+  .fake-funnel-nav { background: #222; color: #fff; padding: 16px; text-align: center; }
+  .fake-ghl-form { max-width: 780px; margin: 20px auto; padding: 20px; border: 2px dashed #888; background: #fafafa; }
+  .fake-ghl-form h3 { margin-top: 0; color: #666; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="fake-funnel-nav">FAKE FUNNEL HEADER</div>
+
+<!-- The widget injects itself into this div. data-primary-color locks the LPI teal. -->
+<div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
+
+<div class="fake-ghl-form">
+  <h3>↓ SIMULATED GHL HIDDEN FORM ↓</h3>
+  <form id="ghl-form" onsubmit="event.preventDefault(); alert(JSON.stringify({
+    medications_json: this.medications_json.value.substring(0,200),
+    medications_summary: this.medications.value
+  }, null, 2));">
+    <input type="hidden" name="medications_json">
+    <input type="hidden" name="medications">
+    <button type="submit" style="padding: 12px 24px; background: #61a3b7; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">Continue → (GHL form submit)</button>
+  </form>
+</div>
+
+<script src="./dist/embed-medications.js"></script>
+</body>
+</html>

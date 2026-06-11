@@ -16,14 +16,23 @@ const ROOT = path.resolve(__dirname, '..');
 // One entry per widget. scope/containerId/guard/configGlobal must be unique so
 // two embeds can coexist on the same GHL page without colliding.
 const WIDGETS = {
-  rx: {
-    input: 'rx-provider-lookup.html',
-    output: 'dist/embed.js',
-    containerId: 'rx-lookup-widget',
-    dataAttr: 'data-rx-lookup-widget',
-    styleAttr: 'data-rx-lookup',
-    guard: '__rxLookupEmbedLoaded',
-    label: 'doc-rx-lookup'
+  medications: {
+    input: 'medications-lookup.html',
+    output: 'dist/embed-medications.js',
+    containerId: 'medications-lookup-widget',
+    dataAttr: 'data-medications-widget',
+    styleAttr: 'data-medications-lookup',
+    guard: '__medsLookupEmbedLoaded',
+    label: 'medications-lookup'
+  },
+  providers: {
+    input: 'provider-lookup.html',
+    output: 'dist/embed-providers.js',
+    containerId: 'provider-lookup-widget',
+    dataAttr: 'data-provider-widget',
+    styleAttr: 'data-provider-lookup',
+    guard: '__provLookupEmbedLoaded',
+    label: 'provider-lookup'
   },
   coverage: {
     input: 'current-coverage-lookup.html',
