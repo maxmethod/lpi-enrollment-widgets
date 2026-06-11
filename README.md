@@ -27,19 +27,19 @@ Paste each into a Custom Code / Custom HTML block. The widget can sit **directly
 **Medications**
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.0/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.1/dist/embed-medications.js"></script>
 ```
 
 **Doctors / Providers**
 ```html
 <div id="provider-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.0/dist/embed-providers.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.1/dist/embed-providers.js"></script>
 ```
 
 **Current Coverage**
 ```html
 <div id="coverage-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.0/dist/embed-coverage.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.1/dist/embed-coverage.js"></script>
 ```
 
 > The form's matching custom fields must be present on the same rendered page (hidden inputs are fine). Note: GHL's in-builder **preview** may not run `<script>` — test on the **published** form.
