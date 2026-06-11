@@ -27,19 +27,19 @@ Paste each into a Custom Code / Custom HTML block. The widget can sit **directly
 **Medications**
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.2.0/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-medications.js"></script>
 ```
 
 **Doctors / Providers**
 ```html
 <div id="provider-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.2.0/dist/embed-providers.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-providers.js"></script>
 ```
 
 **Current Coverage**
 ```html
 <div id="coverage-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.2.0/dist/embed-coverage.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-coverage.js"></script>
 ```
 
 > The form's matching custom fields must be present on the same rendered page (hidden inputs are fine). Note: GHL's in-builder **preview** may not run `<script>` — test on the **published** form.
@@ -65,9 +65,24 @@ https://cdn.jsdelivr.net/gh/maxmethod/doc-rx-lookup@v1.0.9/dist/us-zips.json
 
 (set in `ZIP_DATASET_URL` inside `provider-lookup.html`). On `localhost` it auto-resolves to a local `./dist/us-zips.json` if present. No need to commit the dataset here.
 
-## Field mapping note
+## Field mapping note — match by GHL field ID (important gotcha)
 
-`🏥 Prescriptions` resolves to GHL key **`medications`** (not `prescriptions`) and `🏥 Doctors` to **`doctors`** on the live LPI location — verified 2026-06-11. These are configured in the `FIELD_KEYS` const at the top of each widget; override per-page via `window.MEDS_CONFIG` / `window.PROV_CONFIG` `{ fieldKeys: {...} }` before the embed loads.
+**On a live GHL form, the custom-field input's `name=` is the GHL field ID; its `data-q` is a slug of the field's *label*, which GHL caches inside the form when the field is added.** Consequences (learned the hard way, 2026-06-11):
+- Renaming the global custom field does **not** update the form's `data-q`.
+- Any punctuation/extra words in the label leak into `data-q` — a field labeled "… (widget)" rendered `data-q="current_coverage_json_(widget)"`, so matching by a clean key never connected.
+
+So each widget targets its destination field by **both** the clean key (standalone/testing placeholders) **and** the stable **GHL field ID** (what actually connects on the live form). `setAll()` accepts an array. Field IDs verified on the live LPI location:
+
+| Output | Clean key | GHL field ID | GHL field |
+| --- | --- | --- | --- |
+| meds JSON | `medications_json` | `9Ntdoe7rPRtvesiIpwet` | Medications Json |
+| meds summary | `medications` | `bfueEINiKDtEIP5CdE98` | 🏥 Prescriptions |
+| providers JSON | `providers_json` | `aAWx4APM5udep77XC9gw` | Providers Json |
+| providers summary | `doctors` | `kn0LprMsJXOzXEGY9KXY` | 🏥 Doctors |
+| coverage JSON | `current_coverage_json` | `Cuj5yUIHcBAuqcL7y9oG` | Current Coverage Json |
+| coverage summary | `current_coverage_summary` | `Fuz39fEJ4mGL6ZKuZbQC` | Current Coverage Summary |
+
+All six destination fields are **LARGE_TEXT** (do not confuse `🏥 Prescriptions`/`🏥 Doctors` with the single-line `Prescription List`/`Provider List` legacy fields). To retarget, edit `FIELD_KEYS` at the top of a widget, or override per-page via `window.<WIDGET>_CONFIG = { fieldKeys: { <output>: ['<key>', '<fieldId>'] } }`. Get a field's ID from `GET /locations/{loc}/customFields` (see `scripts/create_widget_fields.js`).
 
 ## Versioning & deploys
 

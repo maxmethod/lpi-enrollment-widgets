@@ -189,7 +189,7 @@ jsDelivr serves **immutable content per git tag**, so:
 **Embed snippet** (per widget; `data-primary-color` locks the LPI teal so GHL's gold brand value can't override it):
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.2.0/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-medications.js"></script>
 ```
 
 **Custom fields** — create in *Settings → Custom Fields*, type **Multi-line / Large text** (JSON payloads exceed single-line limits). The widget targets each by its **field key**, matching `[name="<key>"]` **and** `[data-q="<key>"]`.
@@ -203,7 +203,7 @@ jsDelivr serves **immutable content per git tag**, so:
 
 **Fields created for this rollout ✓ (LARGE_TEXT, folder `LPI - Pre-Enrollment Form Data` `QHuwbPgm36VRG0d5ZKw1`):** `medications_json`, `providers_json`, `current_coverage_json`, `current_coverage_summary`. The two summaries reuse the **existing** `🏥 Prescriptions` (key **`medications`**) / `🏥 Doctors` (key **`doctors`**) fields — verified on live 2026-06-11, no new summary fields needed.
 
-**Verify once in DevTools:** inspect a rendered hidden field and confirm `data-q` equals the bare key (e.g. `medications_json`, no `contact.` prefix). If GHL prefixes it, either rename the field key or widen the selector in `syncHiddenFields` to also match the prefixed form.
+**🔑 GHL form `data-q` ≠ field key — match by FIELD ID.** On a rendered GHL form a custom field's input has **`name=` = the GHL field ID** and **`data-q=` = a slug of the field's LABEL** (cached in the form when the field is added; renaming the field does NOT update it, and label punctuation leaks in — e.g. a "… (widget)" label produced `data-q="current_coverage_json_(widget)"`). So the **stable** way to connect is the field ID. Each `FIELD_KEYS` entry is an array `[clean_key, field_id]` and `setAll()` tries both — the clean key hits standalone-test placeholders, the field ID hits the live form. Get IDs from `GET /locations/{loc}/customFields`. Field IDs are in the README field-mapping table.
 
 **Constraints:** HTTPS only (GHL pages are HTTPS ✓). No PHI touches any server we control — data goes straight into GHL's own fields.
 
