@@ -6,19 +6,20 @@ Client-side widgets for the **Lion's Pride Insurance (LPI Advising)** GoHighLeve
 
 > Forked from [`maxmethod/doc-rx-lookup`](https://github.com/maxmethod/doc-rx-lookup) — this repo is the LPI-specific isolation boundary so account-specific fields never ship to the shared CDN that other subaccounts pull from.
 
-## Widgets — three independent embeds
+## Widgets — four independent embeds
 
 | Widget | File | Embed | Container id | GHL fields written |
 | --- | --- | --- | --- | --- |
 | **Medications** | `medications-lookup.html` | `dist/embed-medications.js` | `medications-lookup-widget` | `medications_json` · `medications` (summary → existing `🏥 Prescriptions`) |
 | **Doctors / Providers** | `provider-lookup.html` | `dist/embed-providers.js` | `provider-lookup-widget` | `providers_json` · `doctors` (summary → existing `🏥 Doctors`) |
 | **Current Coverage** | `current-coverage-lookup.html` | `dist/embed-coverage.js` | `coverage-lookup-widget` | `current_coverage_json` · `current_coverage_summary` |
+| **Income Sources** | `income-sources.html` | `dist/embed-income.js` | `income-sources-widget` | `income_json` · `income_summary` · auto-total → existing `2026 Household Income` |
 
-Medications and Doctors are **separate embeds** — place them in the same code block, different blocks, or different form pages. Each uses a distinct container id / global / load-guard, so any combination can coexist on one page.
+Each is a **separate embed** — place them in the same code block, different blocks, or different form pages. Each uses a distinct container id / global / load-guard, so any combination can coexist on one page.
 
 ## Brand color
 
-All three default to the LPI teal **`rgb(97, 163, 183)` (`#61a3b7`)** for buttons and accents. The embed snippets also pass `data-primary-color="rgb(97, 163, 183)"` to **lock** it (so GHL's gold brand value doesn't override it). To use a different color on a page, change that attribute, or set `window.<WIDGET>_CONFIG = { primaryColor: '...' }` before the embed loads.
+All four default to the LPI teal **`rgb(97, 163, 183)` (`#61a3b7`)** for buttons and accents. The embed snippets also pass `data-primary-color="rgb(97, 163, 183)"` to **lock** it (so GHL's gold brand value doesn't override it). To use a different color on a page, change that attribute, or set `window.<WIDGET>_CONFIG = { primaryColor: '...' }` before the embed loads.
 
 ## GHL embed snippets
 
@@ -27,19 +28,25 @@ Paste each into a Custom Code / Custom HTML block. The widget can sit **directly
 **Medications**
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.4.0/dist/embed-medications.js"></script>
 ```
 
 **Doctors / Providers**
 ```html
 <div id="provider-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-providers.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.4.0/dist/embed-providers.js"></script>
 ```
 
 **Current Coverage**
 ```html
 <div id="coverage-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-coverage.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.4.0/dist/embed-coverage.js"></script>
+```
+
+**Income Sources**
+```html
+<div id="income-sources-widget" data-primary-color="rgb(97, 163, 183)"></div>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.4.0/dist/embed-income.js"></script>
 ```
 
 > The form's matching custom fields must be present on the same rendered page (hidden inputs are fine). Note: GHL's in-builder **preview** may not run `<script>` — test on the **published** form.
@@ -81,8 +88,11 @@ So each widget targets its destination field by **both** the clean key (standalo
 | providers summary | `doctors` | `kn0LprMsJXOzXEGY9KXY` | 🏥 Doctors |
 | coverage JSON | `current_coverage_json` | `Cuj5yUIHcBAuqcL7y9oG` | Current Coverage Json |
 | coverage summary | `current_coverage_summary` | `Fuz39fEJ4mGL6ZKuZbQC` | Current Coverage Summary |
+| income JSON | `income_json` | `iRKObG3lqpX5LrGcDwjJ` | Income Json |
+| income summary | `income_summary` | `7dUnzWjq6Ad5wVY8AFQf` | Income Summary |
+| income auto-total | `2026_household_income` | `Y6XE6LxWLDNxR7mJkzdT` | 2026 Household Income (**MONETARY**) |
 
-All six destination fields are **LARGE_TEXT** (do not confuse `🏥 Prescriptions`/`🏥 Doctors` with the single-line `Prescription List`/`Provider List` legacy fields). To retarget, edit `FIELD_KEYS` at the top of a widget, or override per-page via `window.<WIDGET>_CONFIG = { fieldKeys: { <output>: ['<key>', '<fieldId>'] } }`. Get a field's ID from `GET /locations/{loc}/customFields` (see `scripts/create_widget_fields.js`).
+The JSON/summary destinations are **LARGE_TEXT** (do not confuse `🏥 Prescriptions`/`🏥 Doctors` with the single-line `Prescription List`/`Provider List` legacy fields). The income auto-total writes a plain number into the MONETARY `2026 Household Income` — and only when ≥1 income source exists, so it never clobbers a manually-entered value. To retarget, edit `FIELD_KEYS` at the top of a widget, or override per-page via `window.<WIDGET>_CONFIG = { fieldKeys: { <output>: ['<key>', '<fieldId>'] } }`. Get a field's ID from `GET /locations/{loc}/customFields` (see `scripts/create_widget_fields.js`).
 
 ## Versioning & deploys
 

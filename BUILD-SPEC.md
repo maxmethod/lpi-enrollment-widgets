@@ -5,14 +5,14 @@
 
 ## What this project is
 
-A **standalone, self-contained** set of client-side widgets embedded into one GoHighLevel (GHL) subaccount's **enrollment form**. Three tools:
+A **standalone, self-contained** set of client-side widgets embedded into one GoHighLevel (GHL) subaccount's **enrollment form**. Four tools:
 
 | Tool | What it does | Lookups? | Status |
 | --- | --- | --- | --- |
 | **A1. Medications** | Drug search (RxNorm), strength/form/frequency + "Who takes this?" applicant field. Cap 20. | Yes | Built ✓ (`medications-lookup.html`) |
 | **A2. Doctors / Providers** | Doctor search (NLM NPI) with ZIP-radius filter. Cap 10. | Yes | Built ✓ (`provider-lookup.html`) |
-| **B. Income & Assets table** | A multi-step, add-as-many-rows-as-you-need table for income sources and assets. Pure manual entry. | No | Spec only |
-| **C. Current Coverage list** | Add-as-many-rows list of current health plans (type, carrier, start/end). Pure manual entry. | No | Built ✓ (`current-coverage-lookup.html`) |
+| **B. Income Sources** | Add-as-many-rows list: type · source/employer · amount · frequency · who. Annualizes + auto-totals to `2026 Household Income`. Cap 15. | No | Built ✓ (`income-sources.html`) |
+| **C. Current Coverage list** | Add-as-many-rows list of current health plans (type, carrier, start/end, who). Pure manual entry. | No | Built ✓ (`current-coverage-lookup.html`) |
 
 All write their data into GHL custom fields via the **same sync bridge** (Section 1.4). **A1 and A2 are two independent embeds** (split from the original combined Rx+Provider widget) so they can be placed separately. B and C are A1/A2 with the lookup layer removed and the search→card UI swapped for a direct add-form. **All widgets default to the LPI teal `rgb(97,163,183)` / `#61a3b7`.**
 
@@ -189,7 +189,7 @@ jsDelivr serves **immutable content per git tag**, so:
 **Embed snippet** (per widget; `data-primary-color` locks the LPI teal so GHL's gold brand value can't override it):
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.3.0/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.4.0/dist/embed-medications.js"></script>
 ```
 
 **Custom fields** — create in *Settings → Custom Fields*, type **Multi-line / Large text** (JSON payloads exceed single-line limits). The widget targets each by its **field key**, matching `[name="<key>"]` **and** `[data-q="<key>"]`.
