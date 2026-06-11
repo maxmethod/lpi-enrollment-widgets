@@ -1,0 +1,21 @@
+# ZIP dataset — served from the OG tool's CDN (maxmethod/doc-rx-lookup); not shipped here.
+dist/us-zips.json
+
+# Source data for the ZIP dataset (only needed to regenerate us-zips.json)
+US.txt
+*.zip
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Node
+node_modules/
+
+# Local dev / secrets
+.env
+.env.local
+*.log
+.claude/
