@@ -34,8 +34,8 @@
     --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }#provider-lookup-widget#provider-lookup-widget * { box-sizing: border-box; }#provider-lookup-widget#provider-lookup-widget .prov-container {
-    max-width: 780px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     font-family: var(--font);
     color: var(--text);
     font-size: 15px;
@@ -112,7 +112,6 @@
     document.body.appendChild(container);
   }
   container.innerHTML = `<div class="prov-container">
-  <h1>Doctors &amp; Providers</h1>
   <p class="subtitle">Add any doctors you want to keep in-network. Search by name near a ZIP, or enter one manually.</p>
 
   <!-- ============ PROVIDERS ============ -->

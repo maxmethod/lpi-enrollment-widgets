@@ -189,7 +189,7 @@ jsDelivr serves **immutable content per git tag**, so:
 **Embed snippet** (per widget; `data-primary-color` locks the LPI teal so GHL's gold brand value can't override it):
 ```html
 <div id="medications-lookup-widget" data-primary-color="rgb(97, 163, 183)"></div>
-<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.1.1/dist/embed-medications.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/maxmethod/lpi-enrollment-widgets@v1.2.0/dist/embed-medications.js"></script>
 ```
 
 **Custom fields** — create in *Settings → Custom Fields*, type **Multi-line / Large text** (JSON payloads exceed single-line limits). The widget targets each by its **field key**, matching `[name="<key>"]` **and** `[data-q="<key>"]`.

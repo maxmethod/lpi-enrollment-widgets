@@ -34,8 +34,8 @@
     --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }#coverage-lookup-widget#coverage-lookup-widget * { box-sizing: border-box; }#coverage-lookup-widget#coverage-lookup-widget .cov-container {
-    max-width: 780px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     font-family: var(--font);
     color: var(--text);
     font-size: 15px;
@@ -96,7 +96,6 @@
     document.body.appendChild(container);
   }
   container.innerHTML = `<div class="cov-container">
-  <h1>Current Coverage Information</h1>
   <p class="subtitle">List coverage that any applicant or dependent has. (Fill out this section if you currently have health insurance even if it is ending.) Add one entry per plan.</p>
 
   <!-- ============ CURRENT COVERAGE ============ -->
