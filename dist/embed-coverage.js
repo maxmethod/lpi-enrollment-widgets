@@ -169,11 +169,15 @@
 // ============================================================
 const MAX_COVERAGES = 15;
 
-// Output field-key mapping. Override via
-//   window.COVERAGE_CONFIG = { fieldKeys: { current_coverage_summary: '...' } };
+// Output field-key mapping. Each output targets the GHL field by BOTH its clean
+// key (standalone/testing placeholders) AND its GHL field ID. On a live GHL form
+// the input's name= is the FIELD ID (data-q is a label-derived slug that GHL
+// caches per-form and is unreliable), so matching the field ID is what actually
+// connects. Field IDs verified on the live LPI location 2026-06-11.
+// Override via window.COVERAGE_CONFIG = { fieldKeys: { current_coverage_summary: [...] } }.
 const FIELD_KEYS = Object.assign({
-  current_coverage_json:    'current_coverage_json',
-  current_coverage_summary: 'current_coverage_summary'
+  current_coverage_json:    ['current_coverage_json', 'Cuj5yUIHcBAuqcL7y9oG'],
+  current_coverage_summary: ['current_coverage_summary', 'Fuz39fEJ4mGL6ZKuZbQC']
 }, (typeof window !== 'undefined' && window.COVERAGE_CONFIG && window.COVERAGE_CONFIG.fieldKeys) || {});
 
 // ============================================================
@@ -328,14 +332,16 @@ function buildCoverageSummary() {
 }
 
 function syncHiddenFields() {
-  const setAll = (key, value) => {
-    if (!key) return;
-    const selector = `[name="${key}"], [data-q="${key}"]`;
-    document.querySelectorAll(selector).forEach(el => {
-      el.value = value;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+  const setAll = (keys, value) => {
+    for (const key of (Array.isArray(keys) ? keys : [keys])) {
+      if (!key) continue;
+      const selector = `[name="${key}"], [data-q="${key}"]`;
+      document.querySelectorAll(selector).forEach(el => {
+        el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
   };
   setAll(FIELD_KEYS.current_coverage_json,    buildCoverageJson());
   setAll(FIELD_KEYS.current_coverage_summary, buildCoverageSummary());

@@ -214,13 +214,15 @@ const MAX_MEDS = 20;
 const DEBOUNCE_MS = 300;
 const RX_BASE = 'https://rxnav.nlm.nih.gov/REST';
 
-// Output field-key mapping (verified on live LPI location 2026-06-11):
-//   medications_json -> new dedicated field
-//   medications_summary -> existing 🏥 Prescriptions (key "medications")
-// Override via window.MEDS_CONFIG = { fieldKeys: { medications_summary: '...' } }.
+// Output field-key mapping. Each output targets the GHL field by BOTH its clean
+// key (standalone/testing placeholders) AND its GHL field ID. On a live GHL form
+// the input's name= is the FIELD ID (data-q is a label-derived slug that GHL
+// caches per-form and is unreliable), so matching the field ID is what actually
+// connects. Field IDs verified on the live LPI location 2026-06-11.
+// Override via window.MEDS_CONFIG = { fieldKeys: { medications_summary: [...] } }.
 const FIELD_KEYS = Object.assign({
-  medications_json:    'medications_json',
-  medications_summary: 'medications'
+  medications_json:    ['medications_json', '9Ntdoe7rPRtvesiIpwet'],
+  medications_summary: ['medications', 'bfueEINiKDtEIP5CdE98']   // 🏥 Prescriptions
 }, (typeof window !== 'undefined' && window.MEDS_CONFIG && window.MEDS_CONFIG.fieldKeys) || {});
 
 // ============================================================
@@ -551,14 +553,16 @@ function buildMedicationsSummary() {
 }
 
 function syncHiddenFields() {
-  const setAll = (key, value) => {
-    if (!key) return;
-    const selector = `[name="${key}"], [data-q="${key}"]`;
-    document.querySelectorAll(selector).forEach(el => {
-      el.value = value;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+  const setAll = (keys, value) => {
+    for (const key of (Array.isArray(keys) ? keys : [keys])) {
+      if (!key) continue;
+      const selector = `[name="${key}"], [data-q="${key}"]`;
+      document.querySelectorAll(selector).forEach(el => {
+        el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
   };
   setAll(FIELD_KEYS.medications_json,    buildMedicationsJson());
   setAll(FIELD_KEYS.medications_summary, buildMedicationsSummary());
