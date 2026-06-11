@@ -190,7 +190,7 @@ jsDelivr serves **immutable content per git tag**, so:
 
 | Tool | Field keys (must match exactly) |
 | --- | --- |
-| A (RX) | **JSON → new fields:** `medications_json`, `providers_json`. **Summaries → existing fields:** `🏥 Prescriptions` (key `prescriptions` — *confirm in DevTools*), `🏥 Doctors` (key `doctors` — *confirm*). |
+| A (RX) | **JSON → new fields:** `medications_json`, `providers_json`. **Summaries → existing fields:** `🏥 Prescriptions` (key **`medications`** ✓ verified), `🏥 Doctors` (key **`doctors`** ✓ verified). |
 | B (Income/Assets) | `income_json`, `income_summary`, `assets_json`, `assets_summary` *(confirm keys w/ HealthSherpa mapping owner)* |
 | C (Current Coverage) | `current_coverage_json`, `current_coverage_summary` *(both new)* |
 
@@ -325,10 +325,9 @@ File: **`current-coverage-lookup.html`** → builds to **`dist/embed-coverage.js
 - [x] Tool A: new prescription field(s) → **`applicant_name` ("Who takes this?")** done (Section 3.3).
 - [x] Tool A: output mapping → **JSON to new fields, summaries to existing `🏥 Prescriptions`/`🏥 Doctors`** (Section 2).
 - [x] Tool C: current-coverage data model + storage → **built; `current_coverage_json` + `current_coverage_summary`** (Section 4C).
-- [x] Hosting → **git repo + jsDelivr** (public repo, or alt-host if private required — Section 1.10).
-- [ ] **Confirm the real `data-q` keys of `🏥 Prescriptions` / `🏥 Doctors`** in the live form (DevTools). If not `prescriptions`/`doctors`, set `window.RX_CONFIG.fieldKeys`.
-- [ ] **Create the 4 new LARGE_TEXT fields** (`medications_json`, `providers_json`, `current_coverage_json`, `current_coverage_summary`) — needs a fresh PIT (rotate the ones in HANDOFF first).
-- [ ] **Stand up the repo + push a tag**, bump `@vX.Y.Z` in the embed snippets (and `ZIP_DATASET_VERSION` for Tool A if the ZIP file moves to this repo's CDN).
-- [ ] Embed all three Custom Code blocks into the GHL form pages + DevTools-verify each field lands end-to-end into a test contact.
+- [x] Hosting → **public repo `maxmethod/lpi-enrollment-widgets` + jsDelivr**, tag **`v1.0.0`** live (both embeds HTTP 200).
+- [x] **Confirmed `data-q` keys** on the live LPI location (2026-06-11): `🏥 Prescriptions` → **`medications`**, `🏥 Doctors` → **`doctors`** (set in `FIELD_KEYS`).
+- [x] **Created the 4 new LARGE_TEXT fields** (`medications_json`, `providers_json`, `current_coverage_json`, `current_coverage_summary`) in folder `QHuwbPgm36VRG0d5ZKw1` via `scripts/create_widget_fields.js`.
+- [x] **Repo stood up + tagged `v1.0.0`**; embed snippets point at `@v1.0.0`.
+- [ ] **Embed all three Custom Code blocks** into the GHL form pages + verify each field lands end-to-end into a test contact (the only step left — user does it in the GHL builder).
 - [ ] Tool B (Income & Assets): still spec-only — data model + exact GHL field keys (HealthSherpa mapping owner); multi-step vs. single page.
-- [ ] Subaccount name/ID → final repo + project name.
