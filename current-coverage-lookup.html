@@ -180,6 +180,13 @@
         </div>
       </div>
 
+      <div class="field-group single">
+        <div>
+          <label for="cov-who">Who does this cover? (optional)</label>
+          <input type="text" id="cov-who" placeholder="e.g. John Smith / Whole household" autocomplete="off">
+        </div>
+      </div>
+
       <div class="actions-right">
         <button type="button" id="cov-clear">Clear</button>
         <button type="button" class="primary" id="cov-add">Add coverage</button>
@@ -212,7 +219,7 @@ const FIELD_KEYS = Object.assign({
 // STATE
 // ============================================================
 const state = {
-  coverages: []   // { id, coverage_type, insurance_company, start_date, end_date }
+  coverages: []   // { id, coverage_type, insurance_company, start_date, end_date, who_covered }
 };
 
 // ============================================================
@@ -249,6 +256,7 @@ const els = {
   company: document.getElementById('cov-company'),
   start:   document.getElementById('cov-start'),
   end:     document.getElementById('cov-end'),
+  who:     document.getElementById('cov-who'),
   warn:    document.getElementById('cov-warn'),
   addBox:  document.getElementById('cov-add-box')
 };
@@ -262,6 +270,7 @@ function clearAddForm() {
   els.company.value = '';
   els.start.value = '';
   els.end.value = '';
+  els.who.value = '';
   els.warn.classList.remove('visible');
 }
 
@@ -279,7 +288,8 @@ document.getElementById('cov-add').onclick = () => {
     coverage_type,
     insurance_company: els.company.value.trim() || null,
     start_date:        els.start.value || null,
-    end_date:          els.end.value || null
+    end_date:          els.end.value || null,
+    who_covered:       els.who.value.trim() || null
   };
   state.coverages.push(entry);
   clearAddForm();
@@ -303,6 +313,7 @@ function renderCoverages() {
         <div class="item-card-main">
           <div class="item-card-name">${escapeHtml(c.coverage_type)}</div>
           ${metaParts.length ? `<div class="item-card-meta">${metaParts.join(' · ')}</div>` : ''}
+          ${c.who_covered ? `<div class="item-card-meta">Covers: ${escapeHtml(c.who_covered)}</div>` : ''}
         </div>
         <button class="danger-text" data-remove-cov="${c.id}">Remove</button>
       </div>
@@ -333,7 +344,8 @@ function buildCoverageJson() {
       coverage_type: c.coverage_type,
       insurance_company: c.insurance_company,
       start_date: c.start_date,
-      end_date: c.end_date
+      end_date: c.end_date,
+      who_covered: c.who_covered
     }))
   });
 }
@@ -345,8 +357,11 @@ function buildCoverageSummary() {
     let head = `• ${c.coverage_type}`;
     if (c.insurance_company) head += ` — ${c.insurance_company}`;
     lines.push(head);
+    const detail = [];
     const period = formatPeriod(c.start_date, c.end_date);
-    if (period) lines.push(`  ${period}`);
+    if (period) detail.push(period);
+    if (c.who_covered) detail.push(`covers ${c.who_covered}`);
+    if (detail.length) lines.push(`  ${detail.join(' · ')}`);
   }
   return lines.join('\n').trim();
 }
