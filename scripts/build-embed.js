@@ -42,6 +42,15 @@ const WIDGETS = {
     styleAttr: 'data-coverage-lookup',
     guard: '__coverageWidgetEmbedLoaded',
     label: 'current-coverage'
+  },
+  income: {
+    input: 'income-sources.html',
+    output: 'dist/embed-income.js',
+    containerId: 'income-sources-widget',
+    dataAttr: 'data-income-widget',
+    styleAttr: 'data-income-sources',
+    guard: '__incomeSourcesEmbedLoaded',
+    label: 'income-sources'
   }
 };
 
